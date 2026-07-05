@@ -9,19 +9,20 @@ app.use(cors()); // Permite que React hable con Node
 app.use(express.json({ limit: '50mb' })); // Permite JSONs grandes con fotos en Base64
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// --- CONEXIÓN A LA BASE DE DATOS ---
+// --- CONEXIÓN A LA BASE DE DATOS (MIGRADA A PRODUCCIÓN) ---
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'logwork_pro'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'logwork_pro',
+    port: process.env.DB_PORT || 3306
 });
 
 db.connect(err => {
     if (err) {
-        console.error("❌ ERROR AL CONECTAR DB: " + err.message);
+        console.error("❌ ERROR AL CONECTAR DB EN LA NUBE: " + err.message);
     } else {
-        console.log("✅ BASE DE DATOS CONECTADA (LOGWORK PRO)");
+        console.log("✅ BASE DE DATOS REMOTA CONECTADA CORRECTAMENTE");
     }
 });
 
@@ -288,7 +289,7 @@ app.put('/api/admin/machines/:id', (req, res) => {
 });
 
 // --- INICIO DEL SERVIDOR ---
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; 
 app.listen(PORT, () => {
     console.log(`🚀 SERVIDOR INDUSTRIAL CORRIENDO EN PUERTO ${PORT}`);
 });
